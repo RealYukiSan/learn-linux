@@ -127,6 +127,7 @@ df -h
 - [UNIX Stackexchange](https://unix.stackexchange.com/a/151483/606032) - Who provide the UUID in the `root` kernel parameter? initramfs - PARTUUID is a good alternative too!
 - [stackoverflow](https://stackoverflow.com/questions/10603104/the-difference-between-initrd-and-initramfs) - initramfs vs initrd
 - [askubuntu](https://askubuntu.com/q/1511094/1783505) - create partition on disk image
+- [joe-bergeron](https://www.joe-bergeron.com/posts/Writing%20a%20Tiny%20x86%20Bootloader/) - what is bootloader? tiny bootloader
 
 ## Question
 is it true that transfering the kernel [directly](https://tldp.org/HOWTO/Bootdisk-HOWTO/x703.html) without bootloader [no longer possible](https://superuser.com/questions/415429/how-to-boot-linux-kernel-without-bootloader)?
