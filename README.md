@@ -118,15 +118,16 @@ df -h
 ## Link and references
 - [linuxfromscratch](https://www.linuxfromscratch.org/lfs/view/stable) - LFS Guide
 - [tldp](https://tldp.org/HOWTO/Bootdisk-HOWTO) - HOWTO create rescue disk
-- [Arch Wiki](https://wiki.archlinux.org/title/Installation_guide) - installation guide
+- [wiki.archlinux](https://wiki.archlinux.org/title/Installation_guide) - installation guide
 - Manual Page
     - `man mount`
     - `cat /proc/filesystems` or `ls /lib/modules/$(uname -r)/kernel/fs`
-- [Arch Wiki](https://wiki.archlinux.org/title/Syslinux#BIOS_systems) - BIOS System
-- [Syslinux Wiki](https://wiki.syslinux.org/wiki/index.php?title=Library_modules#Syslinux_modules_working_dependencies) - Syslinux modules working dependencies
-- [UNIX Stackexchange](https://unix.stackexchange.com/a/151483/606032) - Who provide the UUID in the `root` kernel parameter? initramfs - PARTUUID is a good alternative too!
+- [wiki.archlinux](https://wiki.archlinux.org/title/Syslinux#BIOS_systems) - BIOS System
+- [wiki.syslinux](https://wiki.syslinux.org/wiki/index.php?title=Library_modules#Syslinux_modules_working_dependencies) - Syslinux modules working dependencies
+- [unix](https://unix.stackexchange.com/a/151483/606032) - Who provide the UUID in the `root` kernel parameter? initramfs - PARTUUID is a good alternative too!
 - [stackoverflow](https://stackoverflow.com/questions/10603104/the-difference-between-initrd-and-initramfs) - initramfs vs initrd
 - [askubuntu](https://askubuntu.com/q/1511094/1783505) - create partition on disk image
+- [unix](https://unix.stackexchange.com/q/774947/606032) - install bootloader on unpartitioned disk
 - [joe-bergeron](https://www.joe-bergeron.com/posts/Writing%20a%20Tiny%20x86%20Bootloader/) - what is bootloader? tiny bootloader
 
 ## Question
