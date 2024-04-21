@@ -54,19 +54,73 @@ Just remember to replace the `$LFS` variable with `/mnt/newsystem`.
 
 ### `chroot` into the system that have been prepared
 
-same as the LFS instruction above, but using sh instead of bash.
+same as the LFS instruction above, but using `sh` instead of `bash`.
 
 and here's the list for additional program that doesn't provided by busybox by default:
 - [sysklogd](https://github.com/troglobit/sysklogd/releases)
-- [sysvinit]()
+- [sysvinit](https://github.com/slicer69/sysvinit)
+
+### Configure the fstab
+
+## Run it on QEMU
+
+```
+qemu-system-x86_64 \
+-drive format=raw,file=./boot.img,index=0,media=disk \
+-nographic -enable-kvm
+```
+
+You also able to using physical device instead of disk image by `-hdb <device>` option
+
+## Misc
+
+### Make a backup using disk image format
+
+transfer device to disk image file:
+
+```
+dd if=<device> of=<file.img> oflag=direct conv=fsync bs=4M status=progress
+```
+
+to mount, use offset to specify which partition to be mounted.
+
+you can also run the image on QEMU! if the disk img using partition, don't forget to use `/dev/sda1` instead of `/dev/sda` for `root` kernel parameter
+
+### MBR bootstrap code
+
+The file system has unallocated space at the front of the disk, here's the proof:
+
+```
+dd if=/dev/zero of=test.img status=progress bs=200M count=1
+mkfs.ext2 test.img
+hexdump -C test.img | less # check the first offset
+dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/bios/mbr.bin of=test.img
+hexdump -C test.img | less # re-check the first offset
+```
+
+see the [MBR bootstrap code creation](https://superuser.com/questions/1206396/mbr-bootstrap-code-creation).
+
+### Useful command for debugging
+
+```
+findmnt -A
+mount
+losetup -a
+df -h
+```
 
 ## Link and references
-- [LFS Guide](https://www.linuxfromscratch.org/lfs/view/stable)
-- [tldp HOWTO](https://tldp.org/HOWTO/Bootdisk-HOWTO)
+- [linuxfromscratch](https://www.linuxfromscratch.org/lfs/view/stable) - LFS Guide
+- [tldp](https://tldp.org/HOWTO/Bootdisk-HOWTO) - HOWTO create rescue disk
 - [Arch Wiki](https://wiki.archlinux.org/title/Installation_guide) - installation guide
 - Manual Page
     - `man mount`
     - `cat /proc/filesystems` or `ls /lib/modules/$(uname -r)/kernel/fs`
+- [Arch Wiki](https://wiki.archlinux.org/title/Syslinux#BIOS_systems) - BIOS System
+- [Syslinux Wiki](https://wiki.syslinux.org/wiki/index.php?title=Library_modules#Syslinux_modules_working_dependencies) - Syslinux modules working dependencies
+- [UNIX Stackexchange](https://unix.stackexchange.com/a/151483/606032) - Who provide the UUID in the `root` kernel parameter? initramfs - PARTUUID is a good alternative too!
+- [stackoverflow](https://stackoverflow.com/questions/10603104/the-difference-between-initrd-and-initramfs) - initramfs vs initrd
+- [askubuntu](https://askubuntu.com/q/1511094/1783505) - create partition on disk image
 
 ## Question
 is it true that transfering the kernel [directly](https://tldp.org/HOWTO/Bootdisk-HOWTO/x703.html) without bootloader [no longer possible](https://superuser.com/questions/415429/how-to-boot-linux-kernel-without-bootloader)?
