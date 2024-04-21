@@ -14,10 +14,7 @@ see the [wiki](https://en.wikipedia.org/wiki/Booting_process_of_Linux) for more 
 - latest stable linux Kernel
 
 ## Partition layout and File system
-- 1 GB for / with ext4 format
-- 1 GB for / /home with ext4 format
-- a few MB for /boot with ext2 format (?)
-- optional swap partition (?)
+- 200 MB for root filesystem with ext4 format
 
 ## Building LFS-like in the stages
 1. Create disk image file instead of formatting physical drive
@@ -60,7 +57,16 @@ and here's the list for additional program that doesn't provided by busybox by d
 - [sysklogd](https://github.com/troglobit/sysklogd/releases)
 - [sysvinit](https://github.com/slicer69/sysvinit)
 
-### Configure the fstab
+### Configure the `/etc/fstab`
+
+```
+proc           /proc          proc     nosuid,noexec,nodev 0     0
+sysfs          /sys           sysfs    nosuid,noexec,nodev 0     0
+tmpfs          /run           tmpfs    defaults            0     0
+devtmpfs       /dev           devtmpfs mode=0755,nosuid    0     0
+tmpfs          /dev/shm       tmpfs    nosuid,nodev        0     0
+devpts         /dev/pts       devpts   gid=5,mode=620      0     0
+```
 
 ## Run it on QEMU
 
