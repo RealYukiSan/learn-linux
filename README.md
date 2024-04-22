@@ -37,18 +37,32 @@ enable boot flag and create partition with whole disk image size.
 fdisk ./linux.img
 ```
 
-after performing operation on the disk image, you need to repair it:
+after adding partition on the disk image:
+- map the partition
+- format the partition
+- mount the partition
 
-```
-sudo losetup -f ./linux.img
-sudo fsck /dev/loop<n>
+```bash
+sudo kpartx -av ./linux.img
+sudo mkfs.ext4 /dev/mapper/loop<n>p<m>
 sudo mkdir -v /mnt/newsystem
-sudo mount -v /dev/loop<n> /mnt/newsystem
+sudo mount -v /dev/mapper/loop<n>p<m> /mnt/newsystem
 ```
 
-replace <n> with the proper number.
+replace <n> with the proper device number, and <m> with partition number.
 
-execute `umount -d /dev/loop<n>` later after you've done with the disk image.
+check if it's successfuly mounted by `findmnt -T /mnt/newsystem`.
+
+later after you've done with the disk image, execute:
+```bash
+sudo kpartx -dv ./linux.img
+sudo umount -dv /mnt/newsystem
+```
+
+if you want to mount the image, mount the partition by specifying the offset:
+```bash
+sudo mount linux.img /mnt/newsystem -o loop,offset=$((512*2048))
+```
 
 ## Prepare the linux system
 
@@ -108,12 +122,12 @@ MENU TITLE Boot
 LABEL limnux
 	MENU LABEL Limnux ayooo
 	LINUX /boot/bzImage
-	APPEND root=/dev/sda rw
+	APPEND root=/dev/sda1 console=ttyS0 rw
 EOF
 sudo cp -v /usr/lib/syslinux/bios/{vesamenu.c32,libutil.c32,libcom32.c32}  /mnt/usb/boot/syslinux
 ```
 
-replace the root kernel parameter with PARTUUID if you want to use it with usb flash drive
+delete the console and replace the root kernel parameter with PARTUUID if you want to use it with usb flash drive
 
 and the last thing, copy the compiled kernel into `/boot` directory
 
@@ -121,7 +135,7 @@ and the last thing, copy the compiled kernel into `/boot` directory
 
 ```bash
 qemu-system-x86_64 \
--drive format=raw,file=./boot.img,index=0,media=disk \
+-drive format=raw,file=./linux.img,index=0,media=disk \
 -nographic -enable-kvm
 ```
 
