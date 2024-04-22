@@ -22,22 +22,37 @@ see the [wiki](https://en.wikipedia.org/wiki/Booting_process_of_Linux) for more 
 3. Test the newly created linux system on QEMU emulator
 4. Transfer the newly created linux system to USB flash drive
 
-## Create the disk image
+## Create the disk image 
 
 ```bash
-dd if=/dev/zero of=root.img bs=1G count=1
-mkfs -v -t ext4 ./root.img
+dd if=/dev/zero of=linux.img bs=200M count=1 status=progress
+mkfs -v -t ext4 ./linux.img
 ```
 
-## Mount and prepare the linux system
+### Setup partition
+
+enable boot flag and create partition with whole disk image size.
+
+```bash
+fdisk ./linux.img
+```
+
+after performing operation on the disk image, you need to repair it:
+
+```
+sudo losetup -f ./linux.img
+sudo fsck /dev/loop<n>
+sudo mkdir -v /mnt/newsystem
+sudo mount -v /dev/loop<n> /mnt/newsystem
+```
+
+replace <n> with the proper number.
+
+execute `umount -d /dev/loop<n>` later after you've done with the disk image.
+
+## Prepare the linux system
 
 We'll populate the disk image with minimum requirement for building a linux system.
-
-```bash
-mkdir -v /mnt/newsystem
-mount -v -t ext4 root.img /mnt/newsystem
-extlinux -i /mnt/newsystem
-```
 
 install the busybox, see the gist above.
 
@@ -47,30 +62,64 @@ make sure the owner of `/mnt/newsystem` are root (though by default it's already
 
 To be able to perform chroot, we need to prepare the virtual kernel file systems so the kernel will be able to communicate with the kernel itself, see the LFS chapter 7.3 for the rest of instruction.
 
-Just remember to replace the `$LFS` variable with `/mnt/newsystem`.
+```bash
+sudo mkdir -pv /mnt/newsystem/{dev,proc,sys,run,tmp}
+```
 
-### `chroot` into the system that have been prepared
+### Preparing standard directory
 
-same as the LFS instruction above, but using `sh` instead of `bash`.
+```bash
+sudo mkdir -pv /mnt/newsystem/{etc,home,root,boot/syslinux}
+```
 
-and here's the list for additional program that doesn't provided by busybox by default:
-- [sysklogd](https://github.com/troglobit/sysklogd/releases)
-- [sysvinit](https://github.com/slicer69/sysvinit)
+Bash is really cool and badass! You can create multiple directories in all sorts of ways, even with just a single line of code.
 
 ### Configure the `/etc/fstab`
 
-```
+```bash
+sudo cat > /mnt/newsystem/etc/fstab << "EOF"
 proc           /proc          proc     nosuid,noexec,nodev 0     0
 sysfs          /sys           sysfs    nosuid,noexec,nodev 0     0
 tmpfs          /run           tmpfs    defaults            0     0
 devtmpfs       /dev           devtmpfs mode=0755,nosuid    0     0
 tmpfs          /dev/shm       tmpfs    nosuid,nodev        0     0
 devpts         /dev/pts       devpts   gid=5,mode=620      0     0
+EOF
 ```
+
+add `mount -a` later in your init program?
+
+### Install the syslinux bootloader
+
+```bash
+extlinux -i /mnt/newsystem/boot/syslinux --device=/dev/loop<n>
+```
+
+### Configure syslinux
+
+```bash
+sudo cat > /mnt/newsystem/boot/syslinux/extlinux.conf << "EOF"
+TIMEOUT 300
+ONTIMEOUT limnux
+
+UI vesamenu.c32
+MENU TITLE Boot
+
+LABEL limnux
+	MENU LABEL Limnux ayooo
+	LINUX /boot/bzImage
+	APPEND root=/dev/sda rw
+EOF
+sudo cp -v /usr/lib/syslinux/bios/{vesamenu.c32,libutil.c32,libcom32.c32}  /mnt/usb/boot/syslinux
+```
+
+replace the root kernel parameter with PARTUUID if you want to use it with usb flash drive
+
+and the last thing, copy the compiled kernel into `/boot` directory
 
 ## Run it on QEMU
 
-```
+```bash
 qemu-system-x86_64 \
 -drive format=raw,file=./boot.img,index=0,media=disk \
 -nographic -enable-kvm
@@ -114,6 +163,11 @@ mount
 losetup -a
 df -h
 ```
+
+### Additional program
+the list for additional program that doesn't provided by busybox by default:
+- [sysklogd](https://github.com/troglobit/sysklogd/releases)
+- [sysvinit](https://github.com/slicer69/sysvinit)
 
 ## Link and references
 - [linuxfromscratch](https://www.linuxfromscratch.org/lfs/view/stable) - LFS Guide
