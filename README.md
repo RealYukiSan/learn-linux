@@ -3,7 +3,7 @@ This repository is an expansion version of [this gist](https://gist.github.com/R
 
 The computer have several stage on booting process, the way to achieve or perform the operation are variant but the overall general stage are same:
 - System startup
-- Bootloader stage (BIOS and GRUB stuff?)
+- BIOS and Bootloader stage
 - Kernel
 - Process init
 
