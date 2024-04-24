@@ -26,27 +26,26 @@ see the [wiki](https://en.wikipedia.org/wiki/Booting_process_of_Linux) for more 
 
 ```bash
 dd if=/dev/zero of=linux.img bs=200M count=1 status=progress
-mkfs -v -t ext4 ./linux.img
 ```
 
 ### Setup partition
 
-enable boot flag and create partition with whole disk image size.
+enable boot flag and create a partition with whole disk image size.
 
 ```bash
 fdisk ./linux.img
 ```
 
 after adding partition on the disk image:
-- map the partition
+- map the partition to loop-back device
 - format the partition
 - mount the partition
 
 ```bash
-sudo kpartx -av ./linux.img
-sudo mkfs.ext4 /dev/mapper/loop<n>p<m>
+sudo losetup -v -P -f linux.img
+sudo mkfs.ext4 /dev/loop<n>p<n>
 sudo mkdir -v /mnt/newsystem
-sudo mount -v /dev/mapper/loop<n>p<m> /mnt/newsystem
+sudo mount -v /dev/loop<n>p<m> /mnt/newsystem
 ```
 
 replace <n> with the proper device number, and <m> with partition number.
@@ -55,11 +54,11 @@ check if it's successfuly mounted by `findmnt -T /mnt/newsystem`.
 
 later after you've done with the disk image, execute:
 ```bash
-sudo kpartx -dv ./linux.img
-sudo umount -dv /mnt/newsystem
+sudo umount -v /mnt/newsystem
+sudo losetup -dv /dev/loop<n>
 ```
 
-if you want to mount the image, mount the partition by specifying the offset:
+in case you want to mount the image, mount the partition by specifying the offset:
 ```bash
 sudo mount linux.img /mnt/newsystem -o loop,offset=$((512*2048))
 ```
@@ -197,6 +196,7 @@ the list for additional program that doesn't provided by busybox by default:
 - [askubuntu](https://askubuntu.com/q/1511094/1783505) - create partition on disk image
 - [unix](https://unix.stackexchange.com/q/774947/606032) - install bootloader on unpartitioned disk
 - [joe-bergeron](https://www.joe-bergeron.com/posts/Writing%20a%20Tiny%20x86%20Bootloader/) - what is bootloader? tiny bootloader
+- [superuser](https://superuser.com/a/1297351/1867794) - auto-mount partition on loop back device
 
 ## Question
 is it true that transfering the kernel [directly](https://tldp.org/HOWTO/Bootdisk-HOWTO/x703.html) without bootloader [no longer possible](https://superuser.com/questions/415429/how-to-boot-linux-kernel-without-bootloader)?
