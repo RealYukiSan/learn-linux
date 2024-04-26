@@ -183,10 +183,6 @@ losetup -a
 df -h
 ```
 
-### Additional program
-the list for additional program that doesn't provided by busybox by default:
-- [sysvinit](https://github.com/slicer69/sysvinit)
-
 ## Link and references
 - [linuxfromscratch](https://www.linuxfromscratch.org/lfs/view/stable) - LFS Guide
 - [tldp](https://tldp.org/HOWTO/Bootdisk-HOWTO) - HOWTO create rescue disk
