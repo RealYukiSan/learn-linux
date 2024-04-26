@@ -12,6 +12,8 @@ see the [wiki](https://en.wikipedia.org/wiki/Booting_process_of_Linux) for more 
 ## The requirement
 - busybox for userspace program
 - latest stable linux Kernel
+- runnning linux operating system on the host
+- USB flash drive or QEMU
 
 ## Partition layout and File system
 - 200 MB for root filesystem with ext4 format
@@ -48,11 +50,11 @@ sudo mkdir -v /mnt/newsystem
 sudo mount -v /dev/loop<n>p<m> /mnt/newsystem
 ```
 
-replace <n> with the proper device number, and <m> with partition number.
+replace \<n> with the proper device number, and \<m> with partition number.
 
 check if it's successfuly mounted by `findmnt -T /mnt/newsystem`.
 
-later after you've done with the disk image, execute:
+later after you've done with the disk image, detach it by:
 ```bash
 sudo umount -v /mnt/newsystem
 sudo losetup -dv /dev/loop<n>
@@ -71,9 +73,7 @@ install the busybox, see the gist above.
 
 make sure the owner of `/mnt/newsystem` are root (though by default it's already root), because when chroot, the only user that available was `root`
 
-### Preparing Virtual Kernel File Systems
-
-To be able to perform chroot, we need to prepare the virtual kernel file systems so the kernel will be able to communicate with the kernel itself, see the LFS chapter 7.3 for the rest of instruction.
+### Preparing directory for Virtual Kernel File Systems
 
 ```bash
 sudo mkdir -pv /mnt/newsystem/{dev,proc,sys,run,tmp}
@@ -108,6 +108,14 @@ add `mount -a` later in your init program?
 extlinux -i /mnt/newsystem/boot/syslinux --device=/dev/loop<n>
 ```
 
+write MBR Bootstrap code:
+
+```bash
+dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/bios/mbr.bin of=linux.img
+```
+
+syslinux cannot be loaded without the bootstrapping code, see the [MBR bootstrap code creation](https://superuser.com/questions/1206396/mbr-bootstrap-code-creation) for further reading.
+
 ### Configure syslinux
 
 ```bash
@@ -123,12 +131,18 @@ LABEL limnux
 	LINUX /boot/bzImage
 	APPEND root=/dev/sda1 console=ttyS0 rw
 EOF
-sudo cp -v /usr/lib/syslinux/bios/{vesamenu.c32,libutil.c32,libcom32.c32}  /mnt/usb/boot/syslinux
+sudo cp -v /usr/lib/syslinux/bios/{vesamenu.c32,libutil.c32,libcom32.c32}  /mnt/newsystem/boot/syslinux
 ```
 
 delete the console and replace the root kernel parameter with PARTUUID if you want to use it with usb flash drive
 
-and the last thing, copy the compiled kernel into `/boot` directory
+and the last thing, copy the compiled kernel:
+
+```bash
+cp -v ./bzImage /mnt/newsystem/boot
+```
+
+the bootloader will loop forever if it can't find the kernel location XD
 
 ## Run it on QEMU
 
@@ -138,11 +152,17 @@ qemu-system-x86_64 \
 -nographic -enable-kvm
 ```
 
+if you use `tigervnc`, remove the `-nographic` and `console` kernel parameter.
+
 You also able to using physical device instead of disk image by `-hdb <device>` option
 
 ## Misc
 
-### Make a backup using disk image format
+### chrooted the disk image
+
+if you want to perform chroot, we need to prepare the virtual kernel file systems so the kernel will be able to communicate with the kernel itself, see the LFS chapter 7.3 for the rest of instruction.
+
+### make a backup using disk image format
 
 transfer device to disk image file:
 
@@ -153,20 +173,6 @@ dd if=<device> of=<file.img> oflag=direct conv=fsync bs=4M status=progress
 to mount, use offset to specify which partition to be mounted.
 
 you can also run the image on QEMU! if the disk img using partition, don't forget to use `/dev/sda1` instead of `/dev/sda` for `root` kernel parameter
-
-### MBR bootstrap code
-
-The file system has unallocated space at the front of the disk, here's the proof:
-
-```
-dd if=/dev/zero of=test.img status=progress bs=200M count=1
-mkfs.ext2 test.img
-hexdump -C test.img | less # check the first offset
-dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/bios/mbr.bin of=test.img
-hexdump -C test.img | less # re-check the first offset
-```
-
-see the [MBR bootstrap code creation](https://superuser.com/questions/1206396/mbr-bootstrap-code-creation).
 
 ### Useful command for debugging
 
