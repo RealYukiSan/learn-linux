@@ -76,7 +76,7 @@ make sure the owner of `/mnt/newsystem` are root (though by default it's already
 ### Preparing directory for Virtual Kernel File Systems
 
 ```bash
-sudo mkdir -pv /mnt/newsystem/{dev,proc,sys,run,tmp}
+sudo mkdir -pv /mnt/newsystem/{dev/{shm,pts},proc,sys,run,tmp}
 ```
 
 ### Preparing standard directory
