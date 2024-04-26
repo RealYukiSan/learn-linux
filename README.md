@@ -134,7 +134,7 @@ EOF
 sudo cp -v /usr/lib/syslinux/bios/{vesamenu.c32,libutil.c32,libcom32.c32}  /mnt/newsystem/boot/syslinux
 ```
 
-delete the console and replace the root kernel parameter with PARTUUID if you want to use it with usb flash drive
+replace the root kernel parameter with PARTUUID if you want to use it with usb flash drive
 
 and the last thing, copy the compiled kernel:
 
@@ -152,7 +152,7 @@ qemu-system-x86_64 \
 -nographic -enable-kvm
 ```
 
-if you use `tigervnc`, remove the `-nographic` and `console` kernel parameter.
+if you use `tigervnc`, remove the `-nographic` and `console` kernel parameter, otherwise if kernel panic occurs the kernel log will not shown.
 
 You also able to using physical device instead of disk image by `-hdb <device>` option
 
@@ -176,7 +176,7 @@ you can also run the image on QEMU! if the disk img using partition, don't forge
 
 ### Useful command for debugging
 
-```
+```bash
 findmnt -A
 mount
 losetup -a
