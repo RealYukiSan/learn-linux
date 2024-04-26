@@ -185,7 +185,6 @@ df -h
 
 ### Additional program
 the list for additional program that doesn't provided by busybox by default:
-- [sysklogd](https://github.com/troglobit/sysklogd/releases)
 - [sysvinit](https://github.com/slicer69/sysvinit)
 
 ## Link and references
