@@ -90,7 +90,7 @@ Bash is really cool and badass! You can create multiple directories in all sorts
 ### Configure the `/etc/fstab`
 
 ```bash
-sudo cat > /mnt/newsystem/etc/fstab << "EOF"
+sudo tee /mnt/newsystem/etc/fstab << "EOF"
 proc           /proc          proc     nosuid,noexec,nodev 0     0
 sysfs          /sys           sysfs    nosuid,noexec,nodev 0     0
 tmpfs          /run           tmpfs    defaults            0     0
@@ -119,7 +119,7 @@ syslinux cannot be loaded without the bootstrapping code, see the [MBR bootstrap
 ### Configure syslinux
 
 ```bash
-sudo cat > /mnt/newsystem/boot/syslinux/extlinux.conf << "EOF"
+sudo tee /mnt/newsystem/boot/syslinux/extlinux.conf << "EOF"
 TIMEOUT 300
 ONTIMEOUT limnux
 
