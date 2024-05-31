@@ -1,4 +1,4 @@
-# A note on building LFS-like system
+# A note on building simple linux system
 This repository is an expansion version of [this gist](https://gist.github.com/RealYukiSan/c69d9cc9120c1e5d7b5afcf371e3f79d)
 
 The computer have several stage on booting process, the way to achieve or perform the operation are variant but the overall general stage are same:
@@ -18,7 +18,7 @@ see the [wiki](https://en.wikipedia.org/wiki/Booting_process_of_Linux) for more 
 ## Partition layout and File system
 - 200 MB for root filesystem with ext4 format
 
-## Building LFS-like in the stages
+## Building linux system in the stages
 1. Create disk image file instead of formatting physical drive
 2. Prepare the linux system on mounted drive
 3. Test the newly created linux system on QEMU emulator
