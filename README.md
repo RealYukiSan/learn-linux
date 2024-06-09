@@ -18,7 +18,7 @@ see the [wiki](https://en.wikipedia.org/wiki/Booting_process_of_Linux) for more 
 ## Partition layout and File system
 - 200 MB for root filesystem with ext4 format
 
-## Building linux system in the stages
+## Outline
 1. Create disk image file instead of formatting physical drive
 2. Prepare the linux system on mounted drive
 3. Test the newly created linux system on QEMU emulator
